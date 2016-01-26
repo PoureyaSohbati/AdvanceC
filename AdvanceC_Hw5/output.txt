@@ -1,0 +1,277 @@
+/************************  Cross Reference Listing  ************************/
+
+ EOF                      	 60	 62
+ ERR_CLOSING_FILE         	 61	 63
+ ERR_OPENING_FILE         	 83
+ FILE                     	  8	 13	 17	 18	 78	 80
+				113
+ HEADER                   	 20	 29
+ NODE                     	 21
+ SEEK_SET                 	121
+ _CrtDumpMemoryLeaks      	 67
+ argc                     	  9	 15	 28	 94	 97
+ argv                     	  9	 15	 28	 31	 32	 94
+ arr                      	 13	 23	 35	 55	 59	113
+				115
+ buffer                   	 19	 33	116	122	123
+ calloc                   	 29
+ char                     	  8	  9	 11	 12	 15	 19
+				 24	 26	 78	 94	116	139
+				140	152	154	166	168	169
+ checkArgs                	  9	 28	 94
+ comment_Quotation        	 12	166
+ compare                  	 10	136
+ destroy                  	 65
+ digits                   	154	155
+ exceptions               	 26
+ exit                     	101
+ fclose                   	 60	 62
+ fgets                    	 33	122
+ file                     	 80	 82	 85
+ filename                 	  8	 78	 82
+ flag                     	 25	 52
+ fopen                    	 82
+ fprintf                  	119	123
+ free                     	 66
+ fseek                    	121
+ ftell                    	 35
+ getchar                  	100
+ header                   	 20	 29	 58	 65	 66
+ if                       	 60	 62	 82	 97	155	171
+				178	185
+ include                  	  6
+ input                    	 13	 17	 31	 33	 35	 59
+				 60	113	121	122
+ int                      	  9	 10	 11	 13	 15	 22
+				 23	 25	 94	113	115	117
+				136	152
+ line                     	 22	 35	 53	 55
+ lineNum                  	117	120	123	124
+ main                     	 15
+ mode                     	  8	 78	 82
+ nodePtr                  	 21
+ openFile                 	  8	 31	 32	 78
+ output                   	 13	 18	 32	 58	 59	 62
+				113	119	123
+ print                    	 58
+ printLine                	 13	 59	113
+ printf                   	 67	 98
+ ptr                      	 24	115	120	121	125	168
+				171	172	174	176	177	178
+				179	182	183	184	185	186
+ return                   	 69	 85	103	127	143	156
+				157	189
+ root                     	 58	 65
+ s1                       	139	143
+ s2                       	140	143
+ sizeof                   	 29
+ str                      	 11	 12	152	155	166	171
+				174	176	177	180	182	183
+				184	187
+ strcat                   	179	186
+ strchr                   	171	174	178	182	185
+ strcmp                   	143
+ strcpy                   	180	187
+ strcspn                  	155
+ strncpy                  	176	183
+ stu1                     	 10	136	139
+ stu2                     	 10	136	140
+ temp                     	169	176	177	179	180	183
+				184	186	187
+ validation               	 11	152
+ void                     	  9	 10	 12	 13	 94	113
+				136	166
+ while                    	 33	120	174	182
+
+
+
+1     : /*This program opens the two file (one input file and one output file)
+2     : 	and prints the all of the identifiers in the input file into the second file
+3     : Name: Poureya Sohbati
+4     : Date: 6/17/2014
+5     : */
+6     : #include "homework5.h"
+7     : 
+8     : FILE* openFile(char filename[], char mode[]);
+9     : void checkArgs( int argc, char **argv);
+10    : int compare(void* stu1, void* stu2);
+11    : int validation(char* str);
+12    : void comment_Quotation(char str[]);
+13    : void printLine(FILE* output, FILE* input, int arr[]);
+14    : 
+15    : int main (int argc, char *argv[])
+16    : {
+17    : 	FILE* input;
+18    : 	FILE* output;
+19    : 	char buffer[100];
+20    : 	HEADER* header;
+21    : 	NODE*nodePtr;
+22    : 	int line = 1;
+23    : 	int arr[200] = {0};
+24    : 	char *ptr;
+25    : 	int flag = 0;
+26    : 	char exceptions[35] = " ()*&[]!=/,-;+'\"{}@#$^\t<>\012|\t?:"; 
+27    : 
+28    : 	checkArgs(argc, argv);
+29    : 	header = (HEADER*) calloc (1, sizeof(HEADER));
+30    : 
+31    : 	input = openFile(argv[1], "r");
+32    : 	output = openFile(argv[2], "w");
+33    : 	while(fgets(buffer, 100, input))
+34    : 	{	
+35    : 		arr[line] = ftell(input);
+36    : 		if(strstr(buffer, "/*"))
+37    : 			flag = 1;
+38    : 		if(!flag){
+39    : 			comment_Quotation(buffer);
+40    : 			ptr = strtok(buffer, exceptions);
+41    : 			if(ptr && validation(ptr))
+42    : 			{
+43    : 				insert(&header->root, ptr, line, compare);
+44    : 				while(ptr = strtok(NULL, exceptions))
+45    : 				{
+46    : 					if(validation(ptr))
+47    : 						insert(&header->root, ptr, line, compare);
+48    : 				}
+49    : 			}
+50    : 		}
+51    : 		if(flag && strstr(buffer, "*/"))
+52    : 			flag = 0;
+53    : 		line++;
+54    : 	}
+55    : 	arr[line-1] = 0;
+56    : 	fprintf(output, "/************************  Cross Reference Listing"
+57    : 					"  ************************/\n\n");
+58    : 	print(output, header->root);
+59    : 	printLine(output, input, arr);
+60    : 	if( fclose(input) == EOF )
+61    : 		ERR_CLOSING_FILE;
+62    : 	if( fclose(output) == EOF )
+63    : 		ERR_CLOSING_FILE;
+64    : 	
+65    : 	header->root = destroy(header->root);
+66    : 	free(header);
+67    : 	printf( _CrtDumpMemoryLeaks() ? "\n\tMemory Leak\n" : "\n\tNo Memory Leak\n");
+68    : 
+69    : 	return 0;
+70    : }
+71    : 
+72    : //===================== openInputFile ======================
+73    : /*
+74    : This function opens a file 
+75    : PRE: filename, opening mode
+76    : POST: opens the file
+77    : */
+78    : FILE* openFile(char filename[], char mode[])
+79    : {
+80    : 	FILE *file;
+81    : 
+82    : 	if(!(file = fopen(filename, mode)))
+83    : 		ERR_OPENING_FILE;
+84    : 
+85    : 	return file;
+86    : }
+87    : 
+88    : //===================== checkArgs ======================
+89    : /*
+90    : This function validates the arguments that the user has entered 
+91    : PRE: number of arguments, array of char*
+92    : POST: checks the user input
+93    : */
+94    : void checkArgs( int argc, char **argv)
+95    : {
+96    : 
+97    :     if (argc != 3){
+98    : 		printf("\tWrong number of parameters."
+99    : 				"\n\tThere should be four parameters.(Only the name of the file)\n"); 
+100   : 		getchar();
+101   : 		exit(2);
+102   : 	}
+103   : 	return;
+104   : }
+105   : 
+106   : //===================== printLine ======================
+107   : /*
+108   : This function prints the the file into another gile
+109   : 		 using the array of  offsets
+110   : PRE: printer to input and output file and array of offsets
+111   : POST: prints the file
+112   : */
+113   : void printLine(FILE* output, FILE* input, int arr[])
+114   : {
+115   : 	int *ptr = arr;
+116   : 	char buffer[100];
+117   : 	int lineNum = 1;
+118   : 
+119   : 	fprintf(output, "\n\n\n");
+120   : 	while(*ptr || lineNum == 1){
+121   : 		fseek(input, *ptr, SEEK_SET);
+122   : 		fgets(buffer, 100, input); 
+123   : 		fprintf(output, "%-6d: %s", lineNum, buffer);
+124   : 		lineNum++;
+125   : 		ptr++;
+126   : 	}
+127   : 	return;
+128   : }
+129   : 
+130   : //===================== compare ======================
+131   : /*
+132   : This function this function compares two strings 
+133   : PRE: 2 void pointers
+134   : POST: returns the copare value
+135   : */
+136   : int compare(void* stu1, void* stu2)
+137   : {
+138   : //	Local Definitions 
+139   : 	char *s1 = ((char*)stu1);
+140   :     char *s2 = ((char*)stu2);;
+141   : 
+142   : //	Statements 
+143   : 	return strcmp(s1, s2);
+144   : }
+145   : 
+146   : //===================== validation ======================
+147   : /*
+148   : This function validates the arguments that the user has entered 
+149   : PRE: a string
+150   : POST: returns 1 if valid 0 if not
+151   : */
+152   : int validation(char* str)
+153   : {
+154   : 	char digits[14] = "0123456789.\134%";
+155   : 	if(!strcspn(str, digits))
+156   : 		return 0;
+157   : 	return 1;
+158   : }
+159   : 
+160   : //===================== comment_Quotation ======================
+161   : /*
+162   : This function gets rid of the comments and quotations 
+163   : PRE: array of chars
+164   : POST: gets rid of the comments and quotations
+165   : */
+166   : void comment_Quotation(char str[])
+167   : {
+168   : 	char *ptr;
+169   : 	char temp[100];
+170   : 
+171   : 	if((ptr = strchr(str, '/')) && (*(ptr+1) == '/'))	
+172   : 		*ptr = '\0';
+173   : 
+174   : 	while(ptr = strchr(str, '\"'))
+175   : 	{
+176   : 		strncpy(temp, str, ptr-str);
+177   : 		temp[ptr-str] = '\0';
+178   : 		if(ptr = strchr(ptr+1, '\"'))
+179   : 			strcat(temp, ptr+1);
+180   : 		strcpy(str, temp);
+181   : 	}
+182   : 	while(ptr = strchr(str, '\'')){
+183   : 		strncpy(temp, str, ptr-str);
+184   : 		temp[ptr-str] = '\0';
+185   : 		if(ptr = strchr(ptr+1, '\''))
+186   : 			strcat(temp, ptr+1);
+187   : 		strcpy(str, temp);
+188   : 	}
+189   : 	return;
+190   : }
