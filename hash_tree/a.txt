@@ -1,0 +1,10 @@
+RUS Russia; Europe; 666 666.00
+IRI Iran; Asia; 111 111.00
+ESP Espane; Europe; 333 333.00
+JPN Japon; Asia; 444 444.00
+USA United States of America; North America; 222 222.00
+CAN Canada; North America; 777 777.00
+CHN China; Asia; 555 555.00
+ITA Italy; Europe; 213 3453.00
+GER Germany; Europe; 123 132.00
+GRE Greece; Europe; 12345 3452.00
